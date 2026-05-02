@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ElectEd — Election Process Education Assistant</title>
+    <meta name="description" content="An interactive assistant that helps you understand the election process, timelines, and steps involved in democratic elections.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="bg-orb bg-orb-1"></div>
+        <div class="bg-orb bg-orb-2"></div>
+        <div class="bg-orb bg-orb-3"></div>
+    </div>
+
+    <!-- Header -->
+    <header id="main-header">
+        <div class="header-inner">
+            <div class="logo" id="logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 40 40" fill="none">
+                        <rect x="4" y="8" width="32" height="24" rx="3" stroke="currentColor" stroke-width="2.5"/>
+                        <path d="M12 20l4 4 12-10" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <span class="logo-text">Elect<span class="logo-accent">Ed</span></span>
+            </div>
+            <nav id="main-nav">
+                <button class="nav-btn active" data-section="home" id="nav-home">Home</button>
+                <button class="nav-btn" data-section="timeline" id="nav-timeline">Timeline</button>
+                <button class="nav-btn" data-section="process" id="nav-process">Process</button>
+                <button class="nav-btn" data-section="quiz" id="nav-quiz">Quiz</button>
+                <button class="nav-btn" data-section="glossary" id="nav-glossary">Glossary</button>
+            </nav>
+            <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Nav -->
+    <div class="mobile-nav" id="mobile-nav">
+        <button class="nav-btn active" data-section="home">Home</button>
+        <button class="nav-btn" data-section="timeline">Timeline</button>
+        <button class="nav-btn" data-section="process">Process</button>
+        <button class="nav-btn" data-section="quiz">Quiz</button>
+        <button class="nav-btn" data-section="glossary">Glossary</button>
+    </div>
+
+    <!-- Main Content -->
+    <main id="main-content">
+
+        <!-- HOME SECTION -->
+        <section class="section section-home active" id="section-home">
+            <div class="hero">
+                <div class="hero-badge">🗳️ Interactive Learning Experience</div>
+                <h1 class="hero-title">
+                    Understand the<br>
+                    <span class="gradient-text">Election Process</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Your interactive guide to understanding how democratic elections work — from voter registration to inauguration. Explore timelines, processes, and test your knowledge.
+                </p>
+                <div class="hero-actions">
+                    <button class="btn btn-primary" id="btn-start-learning" onclick="navigateTo('timeline')">
+                        <span>Start Learning</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </button>
+                    <button class="btn btn-secondary" id="btn-take-quiz" onclick="navigateTo('quiz')">
+                        <span>Take the Quiz</span>
+                    </button>
+                </div>
+
+                <div class="hero-stats">
+                    <div class="stat-card" id="stat-phases">
+                        <div class="stat-number">7</div>
+                        <div class="stat-label">Key Phases</div>
+                    </div>
+                    <div class="stat-card" id="stat-steps">
+                        <div class="stat-number">25+</div>
+                        <div class="stat-label">Detailed Steps</div>
+                    </div>
+                    <div class="stat-card" id="stat-quiz">
+                        <div class="stat-number">15</div>
+                        <div class="stat-label">Quiz Questions</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Info Cards -->
+            <div class="info-grid">
+                <div class="info-card" id="info-card-1">
+                    <div class="info-card-icon">📋</div>
+                    <h3>Registration</h3>
+                    <p>Learn how citizens register to vote and the requirements involved in the process.</p>
+                </div>
+                <div class="info-card" id="info-card-2">
+                    <div class="info-card-icon">🏛️</div>
+                    <h3>Nominations</h3>
+                    <p>Discover how candidates are nominated and the role of political parties.</p>
+                </div>
+                <div class="info-card" id="info-card-3">
+                    <div class="info-card-icon">📢</div>
+                    <h3>Campaigning</h3>
+                    <p>Understand how candidates campaign, debate, and reach voters across the nation.</p>
+                </div>
+                <div class="info-card" id="info-card-4">
+                    <div class="info-card-icon">🗳️</div>
+                    <h3>Voting</h3>
+                    <p>Explore the different methods of voting and how ballots are cast and counted.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- TIMELINE SECTION -->
+        <section class="section section-timeline" id="section-timeline">
+            <div class="section-header">
+                <h2 class="section-title">Election <span class="gradient-text">Timeline</span></h2>
+                <p class="section-subtitle">Follow the journey from announcement to inauguration. Click on any phase to learn more.</p>
+            </div>
+
+            <div class="timeline-container" id="timeline-container">
+                <!-- Timeline items generated by JS -->
+            </div>
+
+            <!-- Timeline Detail Panel -->
+            <div class="timeline-detail-panel" id="timeline-detail-panel">
+                <button class="detail-close" id="detail-close" aria-label="Close detail panel">&times;</button>
+                <div class="detail-content" id="detail-content">
+                    <!-- Filled by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- PROCESS SECTION -->
+        <section class="section section-process" id="section-process">
+            <div class="section-header">
+                <h2 class="section-title">The Election <span class="gradient-text">Process</span></h2>
+                <p class="section-subtitle">Dive deep into each phase of the election cycle. Navigate through the interactive steps below.</p>
+            </div>
+
+            <div class="process-wrapper">
+                <div class="process-tabs" id="process-tabs">
+                    <!-- Generated by JS -->
+                </div>
+                <div class="process-content" id="process-content">
+                    <!-- Generated by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- QUIZ SECTION -->
+        <section class="section section-quiz" id="section-quiz">
+            <div class="section-header">
+                <h2 class="section-title">Test Your <span class="gradient-text">Knowledge</span></h2>
+                <p class="section-subtitle">Take the interactive quiz to see how well you understand the election process!</p>
+            </div>
+
+            <div class="quiz-container" id="quiz-container">
+                <!-- Quiz Start Screen -->
+                <div class="quiz-start" id="quiz-start">
+                    <div class="quiz-start-icon">🎯</div>
+                    <h3>Election Process Quiz</h3>
+                    <p>15 questions covering voter registration, campaigning, voting procedures, and more. Are you ready?</p>
+                    <button class="btn btn-primary" id="btn-start-quiz" onclick="startQuiz()">
+                        <span>Begin Quiz</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </button>
+                </div>
+
+                <!-- Quiz Active -->
+                <div class="quiz-active hidden" id="quiz-active">
+                    <div class="quiz-progress-bar">
+                        <div class="quiz-progress-fill" id="quiz-progress-fill"></div>
+                    </div>
+                    <div class="quiz-meta">
+                        <span id="quiz-question-num">Question 1 of 15</span>
+                        <span id="quiz-score-display">Score: 0</span>
+                    </div>
+                    <div class="quiz-question-card" id="quiz-question-card">
+                        <h3 id="quiz-question-text"></h3>
+                        <div class="quiz-options" id="quiz-options">
+                            <!-- Options generated by JS -->
+                        </div>
+                    </div>
+                    <div class="quiz-feedback hidden" id="quiz-feedback">
+                        <div class="feedback-icon" id="feedback-icon"></div>
+                        <p id="feedback-text"></p>
+                    </div>
+                    <button class="btn btn-primary hidden" id="btn-next-question" onclick="nextQuestion()">
+                        <span>Next Question</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </button>
+                </div>
+
+                <!-- Quiz Results -->
+                <div class="quiz-results hidden" id="quiz-results">
+                    <div class="results-card">
+                        <div class="results-score-ring">
+                            <svg viewBox="0 0 120 120">
+                                <circle cx="60" cy="60" r="52" stroke="rgba(255,255,255,0.1)" stroke-width="8" fill="none"/>
+                                <circle cx="60" cy="60" r="52" stroke="url(#scoreGradient)" stroke-width="8" fill="none"
+                                    stroke-dasharray="326.73" stroke-dashoffset="326.73" stroke-linecap="round"
+                                    id="score-ring-circle" transform="rotate(-90 60 60)"/>
+                                <defs>
+                                    <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" stop-color="#6366f1"/>
+                                        <stop offset="100%" stop-color="#8b5cf6"/>
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                            <div class="results-score-text" id="results-score-text">0%</div>
+                        </div>
+                        <h3 id="results-title">Great Job!</h3>
+                        <p id="results-message">You've shown a good understanding of the election process.</p>
+                        <div class="results-stats">
+                            <div class="results-stat">
+                                <span class="results-stat-num" id="results-correct">0</span>
+                                <span class="results-stat-label">Correct</span>
+                            </div>
+                            <div class="results-stat">
+                                <span class="results-stat-num" id="results-wrong">0</span>
+                                <span class="results-stat-label">Wrong</span>
+                            </div>
+                            <div class="results-stat">
+                                <span class="results-stat-num" id="results-total">15</span>
+                                <span class="results-stat-label">Total</span>
+                            </div>
+                        </div>
+                        <div class="results-actions">
+                            <button class="btn btn-primary" onclick="startQuiz()">
+                                <span>Retake Quiz</span>
+                            </button>
+                            <button class="btn btn-secondary" onclick="navigateTo('process')">
+                                <span>Review Process</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- GLOSSARY SECTION -->
+        <section class="section section-glossary" id="section-glossary">
+            <div class="section-header">
+                <h2 class="section-title">Election <span class="gradient-text">Glossary</span></h2>
+                <p class="section-subtitle">Search and browse key terms related to the election process.</p>
+            </div>
+
+            <div class="glossary-search-wrapper">
+                <div class="glossary-search">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                    <input type="text" id="glossary-search-input" placeholder="Search terms..." autocomplete="off">
+                </div>
+            </div>
+
+            <div class="glossary-grid" id="glossary-grid">
+                <!-- Generated by JS -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Chat Assistant FAB -->
+    <button class="chat-fab" id="chat-fab" aria-label="Open Election Assistant">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+        <span class="fab-pulse"></span>
+    </button>
+
+    <!-- Chat Panel -->
+    <div class="chat-panel" id="chat-panel">
+        <div class="chat-header">
+            <div class="chat-header-info">
+                <div class="chat-avatar">🗳️</div>
+                <div>
+                    <h4>ElectEd Assistant</h4>
+                    <span class="chat-status">Online — Ask me anything!</span>
+                </div>
+            </div>
+            <button class="chat-close" id="chat-close" aria-label="Close chat">&times;</button>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <div class="chat-msg bot">
+                <div class="chat-msg-content">
+                    👋 Hi there! I'm your Election Process Assistant. I can help you understand:
+                    <ul>
+                        <li>How elections work</li>
+                        <li>Voter registration</li>
+                        <li>Campaigning & debates</li>
+                        <li>Voting methods</li>
+                        <li>Results & certification</li>
+                    </ul>
+                    Ask me anything!
+                </div>
+            </div>
+        </div>
+        <div class="chat-suggestions" id="chat-suggestions">
+            <button class="chat-suggestion" onclick="askBot('What are the steps in the election process?')">Election Steps</button>
+            <button class="chat-suggestion" onclick="askBot('How does voter registration work?')">Registration</button>
+            <button class="chat-suggestion" onclick="askBot('What happens on Election Day?')">Election Day</button>
+            <button class="chat-suggestion" onclick="askBot('What is the Electoral College?')">Electoral College</button>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Ask about elections..." autocomplete="off">
+            <button class="chat-send" id="chat-send" aria-label="Send message">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+{
+  "name": "election-process",
+  "version": "1.0.0",
+  "description": "ElectEd — Interactive Election Process Education Assistant",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ruthwik99/Election-Process.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ruthwik99/Election-Process/issues"
+  },
+  "homepage": "https://github.com/ruthwik99/Election-Process#readme",
+  "dependencies": {
+    "@google/genai": "^1.51.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1"
+  }
+}

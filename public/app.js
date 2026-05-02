@@ -1,4 +1,7 @@
 // ===== ELECTION PROCESS APP =====
+const API_BASE = window.location.origin;
+const chatSessionId = Date.now().toString();
+let useBackend = true; // Will fallback to local if backend unavailable
 
 // --- Particles ---
 function initParticles() {
@@ -11,22 +14,22 @@ function initParticles() {
   resize();
   window.addEventListener('resize', resize);
   for (let i = 0; i < 50; i++) {
-    particles.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3, r: Math.random() * 2 + 0.5, o: Math.random() * 0.3 + 0.1 });
+    particles.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: (Math.random()-0.5)*0.3, vy: (Math.random()-0.5)*0.3, r: Math.random()*2+0.5, o: Math.random()*0.3+0.1 });
   }
   function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0,0,canvas.width,canvas.height);
     particles.forEach(p => {
       p.x += p.vx; p.y += p.vy;
-      if (p.x < 0) p.x = canvas.width; if (p.x > canvas.width) p.x = 0;
-      if (p.y < 0) p.y = canvas.height; if (p.y > canvas.height) p.y = 0;
-      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(99,102,241,${p.o})`; ctx.fill();
+      if(p.x<0) p.x=canvas.width; if(p.x>canvas.width) p.x=0;
+      if(p.y<0) p.y=canvas.height; if(p.y>canvas.height) p.y=0;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(99,102,241,${p.o})`; ctx.fill();
     });
     // Draw lines between close particles
-    for (let i = 0; i < particles.length; i++) for (let j = i + 1; j < particles.length; j++) {
-      const dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < 120) { ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.strokeStyle = `rgba(99,102,241,${0.06 * (1 - dist / 120)})`; ctx.stroke(); }
+    for(let i=0;i<particles.length;i++) for(let j=i+1;j<particles.length;j++) {
+      const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<120) { ctx.beginPath(); ctx.moveTo(particles[i].x,particles[i].y); ctx.lineTo(particles[j].x,particles[j].y); ctx.strokeStyle=`rgba(99,102,241,${0.06*(1-dist/120)})`; ctx.stroke(); }
     }
     requestAnimationFrame(draw);
   }
@@ -239,6 +242,9 @@ function showResults() {
     document.getElementById('results-title').textContent = '🔄 Try Again!';
     document.getElementById('results-message').textContent = "Don't worry! Go through the learning sections and come back to ace this quiz.";
   }
+
+  // Submit score to backend
+  submitQuizScore(quizState.score, QUIZ_DATA.length);
 }
 
 // --- Glossary ---
@@ -264,6 +270,48 @@ function renderGlossary() {
     );
     renderCards(filtered);
   });
+}
+
+// --- Submit Quiz Score & Leaderboard ---
+async function submitQuizScore(score, total) {
+  if (!useBackend) return;
+  try {
+    const res = await fetch(`${API_BASE}/api/quiz/score`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'Player', score, total })
+    });
+    const data = await res.json();
+    // Show rank badge
+    const rankEl = document.createElement('div');
+    rankEl.style.cssText = 'margin-top:16px;padding:10px 20px;background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.3);border-radius:10px;font-size:0.9rem;color:var(--text);';
+    rankEl.innerHTML = `🏆 You ranked <strong>#${data.rank}</strong> out of <strong>${data.totalAttempts}</strong> attempts!`;
+    document.querySelector('.results-actions').before(rankEl);
+  } catch(e) { /* silently fail */ }
+}
+
+async function loadLeaderboard() {
+  if (!useBackend) return;
+  try {
+    const res = await fetch(`${API_BASE}/api/quiz/leaderboard`);
+    const data = await res.json();
+    if (data.leaderboard.length > 0) {
+      const board = document.createElement('div');
+      board.id = 'leaderboard';
+      board.style.cssText = 'margin-top:24px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;max-width:700px;margin-left:auto;margin-right:auto;';
+      board.innerHTML = `<h3 style="font-family:var(--font-display);font-size:1.2rem;margin-bottom:16px;">🏆 Leaderboard</h3>` +
+        data.leaderboard.map((s, i) =>
+          `<div style="display:flex;justify-content:space-between;padding:10px 12px;border-radius:8px;margin-bottom:4px;background:${i<3?'rgba(99,102,241,0.08)':'transparent'};">
+            <span>${i<3?['🥇','🥈','🥉'][i]:i+1+'.'} ${s.name}</span>
+            <span style="color:var(--primary);font-weight:600;">${s.percentage}%</span>
+          </div>`
+        ).join('');
+      const quizSection = document.getElementById('section-quiz');
+      const existing = document.getElementById('leaderboard');
+      if (existing) existing.remove();
+      quizSection.appendChild(board);
+    }
+  } catch(e) { /* silently fail */ }
 }
 
 // --- Chat Assistant ---
@@ -321,13 +369,98 @@ function getBotResponse(input) {
   return CHAT_RESPONSES['default'];
 }
 
-function askBot(text) {
+function formatMarkdown(text) {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>');
+}
+
+async function askBot(text) {
   addMessage(text, 'user');
   showTypingIndicator();
-  setTimeout(() => {
-    removeTypingIndicator();
-    addMessage(getBotResponse(text), 'bot');
-  }, 800 + Math.random() * 700);
+
+  if (useBackend) {
+    try {
+      // Create the streaming bot message element
+      removeTypingIndicator();
+      const msg = document.createElement('div');
+      msg.className = 'chat-msg bot';
+      const content = document.createElement('div');
+      content.className = 'chat-msg-content';
+      content.innerHTML = '<span class="streaming-cursor">▊</span>';
+      msg.appendChild(content);
+      chatMessages.appendChild(msg);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+
+      let fullText = '';
+      const encodedMsg = encodeURIComponent(text);
+      const eventSource = new EventSource(`${API_BASE}/api/chat/stream?message=${encodedMsg}&sessionId=${chatSessionId}`);
+
+      eventSource.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+
+        if (data.type === 'token') {
+          fullText += data.content;
+          // Render with markdown formatting + blinking cursor
+          content.innerHTML = formatMarkdown(fullText) + '<span class="streaming-cursor">▊</span>';
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        if (data.type === 'done') {
+          eventSource.close();
+          // Final render without cursor
+          content.innerHTML = formatMarkdown(fullText);
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+
+          // Update suggestion chips with related topics
+          if (data.relatedTopics && data.relatedTopics.length > 0) {
+            const sugContainer = document.getElementById('chat-suggestions');
+            sugContainer.innerHTML = data.relatedTopics.map(t =>
+              `<button class="chat-suggestion" onclick="askBot('Tell me about ${t}')">${t}</button>`
+            ).join('');
+          }
+        }
+      };
+
+      eventSource.onerror = () => {
+        eventSource.close();
+        // Remove cursor on error
+        content.innerHTML = formatMarkdown(fullText) || 'Sorry, something went wrong. Please try again.';
+      };
+
+      return;
+    } catch (e) {
+      console.log('Backend unavailable, using local fallback');
+      useBackend = false;
+    }
+  }
+
+  // Local fallback with typewriter effect
+  removeTypingIndicator();
+  const msg = document.createElement('div');
+  msg.className = 'chat-msg bot';
+  const content = document.createElement('div');
+  content.className = 'chat-msg-content';
+  msg.appendChild(content);
+  chatMessages.appendChild(msg);
+
+  const responseText = getBotResponse(text);
+  const tokens = responseText.split(/(\s+)/);
+  let i = 0;
+  let fullText = '';
+
+  function typeNext() {
+    if (i < tokens.length) {
+      fullText += tokens[i];
+      content.innerHTML = formatMarkdown(fullText) + '<span class="streaming-cursor">▊</span>';
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      i++;
+      setTimeout(typeNext, 25 + Math.random() * 30);
+    } else {
+      content.innerHTML = formatMarkdown(fullText);
+    }
+  }
+  typeNext();
 }
 
 chatSend.addEventListener('click', () => {
@@ -372,15 +505,15 @@ function animateCounter(el, target) {
 
 // --- Confetti ---
 function spawnConfetti(container) {
-  const colors = ['#6366f1', '#8b5cf6', '#a78bfa', '#22c55e', '#f59e0b', '#ec4899'];
+  const colors = ['#6366f1','#8b5cf6','#a78bfa','#22c55e','#f59e0b','#ec4899'];
   for (let i = 0; i < 30; i++) {
     const c = document.createElement('div');
     c.className = 'confetti';
-    c.style.left = Math.random() * 100 + '%';
+    c.style.left = Math.random()*100 + '%';
     c.style.top = '-10px';
-    c.style.background = colors[Math.floor(Math.random() * colors.length)];
-    c.style.animationDelay = Math.random() * 0.5 + 's';
-    c.style.animationDuration = (1 + Math.random()) + 's';
+    c.style.background = colors[Math.floor(Math.random()*colors.length)];
+    c.style.animationDelay = Math.random()*0.5 + 's';
+    c.style.animationDuration = (1+Math.random()) + 's';
     container.appendChild(c);
     setTimeout(() => c.remove(), 2000);
   }
@@ -389,7 +522,7 @@ function spawnConfetti(container) {
 // --- Scroll Reveal ---
 function initScrollReveal() {
   const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+    entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('visible'); } });
   }, { threshold: 0.1 });
   document.querySelectorAll('.info-card, .stat-card, .timeline-item, .glossary-card').forEach(el => {
     el.classList.add('reveal');
@@ -422,4 +555,13 @@ document.addEventListener('DOMContentLoaded', () => {
     animateCounter(el, target);
   });
   setTimeout(initScrollReveal, 100);
+  // Check backend availability
+  fetch(`${API_BASE}/api/health`).then(r => r.json()).then(() => {
+    useBackend = true;
+    console.log('✅ Backend connected');
+    loadLeaderboard();
+  }).catch(() => {
+    useBackend = false;
+    console.log('ℹ️ Running in offline mode (local responses)');
+  });
 });
